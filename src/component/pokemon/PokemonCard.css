@@ -14,7 +14,7 @@
 
 @font-face {
   font-family: "Roboto";
-  src: local("Roboto"), url("../fonts/roboto.regular.ttf") format("truetype");
+  src: local("Roboto"), url("../../fonts/roboto.regular.ttf") format("truetype");
 }
 
 .card-title {

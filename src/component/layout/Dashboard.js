@@ -1,5 +1,5 @@
 import React from "react";
-import PokemonList from "../../pokemon/PokemonList";
+import PokemonList from "../pokemon/PokemonList.js";
 
 export default function Dashboard() {
   return (

@@ -11,7 +11,11 @@ export default function Navbar() {
           href="/"
         >
           PokeDex
-          <img src={pikachuface} style={{ width: "1.5em", height: "1.8em" }} />
+          <img
+            src={pikachuface}
+            style={{ width: "1.5em", height: "1.8em" }}
+            alt="Pikachu"
+          />
         </a>
       </nav>
     </div>
