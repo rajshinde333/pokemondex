@@ -125,67 +125,129 @@ export default function Pokemon() {
 
     //! to Get pokemon Description/information
     const speciesUrl = `https://pokeapi.co/api/v2/pokemon-species/${index}`;
-    await axios.get(speciesUrl).then((res) => {
-      var description_var = "";
-      var description_var1 = "";
-      var description_var2 = "";
-      var description_var3 = "";
-      res.data.flavor_text_entries.some((ele) => {
-        if (ele.language.name === "en") {
-          description_var1 = ele.flavor_text;
-          return;
-        }
-      });
-      res.data.flavor_text_entries.some((ele) => {
-        if (
-          ele.language.name === "en" &&
-          description_var1 !== ele.flavor_text
-        ) {
-          description_var2 = ele.flavor_text;
-          return;
-        }
-      });
-      res.data.flavor_text_entries.some((ele) => {
-        if (
-          ele.language.name === "en" &&
-          description_var1 !== ele.flavor_text &&
-          description_var2 !== ele.flavor_text
-        ) {
-          description_var3 = ele.flavor_text;
-          return;
-        }
-      });
 
-      description_var = description_var1 + description_var2 + description_var3;
-      setDescription(description_var);
+    const speciesRes = await axios.get(speciesUrl);
 
-      //! to get femaleGenderRation, and MaleGenderRatio
-      const femaleRate = res.data["gender_rate"];
-      const genderRatioFemale_var = 12.5 * femaleRate;
-      const genderRatioMale_var = 12.5 * (8 - femaleRate);
-      setGenderRatioFemale(genderRatioFemale_var);
-      setGenderRatioMale(genderRatioMale_var);
+    var description_var = "";
+    var description_var1 = "";
+    var description_var2 = "";
+    var description_var3 = "";
 
-      //! to get the catchRate of Pokemon
-      const catchRate_var = Math.round((100 / 255) * res.data["capture_rate"]);
-      setCatchRate(catchRate_var);
-
-      //! to get the eggGroups of Pokemon
-      const eggGroups_var = res.data["egg_groups"]
-        .map((ele) => {
-          return ele.name
-            .toLowerCase()
-            .split(" ")
-            .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-            .join(" ");
-        })
-        .join(", ");
-      setEggGroup(eggGroups_var);
-
-      //! to get the hatchSteps of Pokemon
-      const hatchSteps_var = 255 * (res.data["hatch_counter"] + 1);
-      setHatchSteps(hatchSteps_var);
+    speciesRes.data.flavor_text_entries.some((ele) => {
+      if (ele.language.name === "en") {
+        description_var1 = ele.flavor_text;
+        return;
+      }
     });
+    speciesRes.data.flavor_text_entries.some((ele) => {
+      if (ele.language.name === "en" && description_var1 !== ele.flavor_text) {
+        description_var2 = ele.flavor_text;
+        return;
+      }
+    });
+    speciesRes.data.flavor_text_entries.some((ele) => {
+      if (
+        ele.language.name === "en" &&
+        description_var1 !== ele.flavor_text &&
+        description_var2 !== ele.flavor_text
+      ) {
+        description_var3 = ele.flavor_text;
+        return;
+      }
+    });
+    description_var = description_var1 + description_var2 + description_var3;
+    setDescription(description_var);
+
+    //! to get femaleGenderRation, and MaleGenderRatio
+    const femaleRate = speciesRes.data["gender_rate"];
+    const genderRatioFemale_var = 12.5 * femaleRate;
+    const genderRatioMale_var = 12.5 * (8 - femaleRate);
+    setGenderRatioFemale(genderRatioFemale_var);
+    setGenderRatioMale(genderRatioMale_var);
+
+    //! to get the catchRate of Pokemon
+    const catchRate_var = Math.round(
+      (100 / 255) * speciesRes.data["capture_rate"]
+    );
+    setCatchRate(catchRate_var);
+
+    //! to get the eggGroups of Pokemon
+    const eggGroups_var = speciesRes.data["egg_groups"]
+      .map((ele) => {
+        return ele.name
+          .toLowerCase()
+          .split(" ")
+          .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+          .join(" ");
+      })
+      .join(", ");
+    setEggGroup(eggGroups_var);
+
+    //! to get the hatchSteps of Pokemon
+    const hatchSteps_var = 255 * (speciesRes.data["hatch_counter"] + 1);
+    setHatchSteps(hatchSteps_var);
+
+    // await axios.get(speciesUrl).then((res) => {
+    // var description_var = "";
+    // var description_var1 = "";
+    // var description_var2 = "";
+    // var description_var3 = "";
+    // res.data.flavor_text_entries.some((ele) => {
+    //   if (ele.language.name === "en") {
+    //     description_var1 = ele.flavor_text;
+    //     return;
+    //   }
+    // });
+    // res.data.flavor_text_entries.some((ele) => {
+    //   if (
+    //     ele.language.name === "en" &&
+    //     description_var1 !== ele.flavor_text
+    //   ) {
+    //     description_var2 = ele.flavor_text;
+    //     return;
+    //   }
+    // });
+    // res.data.flavor_text_entries.some((ele) => {
+    //   if (
+    //     ele.language.name === "en" &&
+    //     description_var1 !== ele.flavor_text &&
+    //     description_var2 !== ele.flavor_text
+    //   ) {
+    //     description_var3 = ele.flavor_text;
+    //     return;
+    //   }
+    // });
+
+    // description_var = description_var1 + description_var2 + description_var3;
+    // setDescription(description_var);
+
+    // //! to get femaleGenderRation, and MaleGenderRatio
+    // const femaleRate = res.data["gender_rate"];
+    // const genderRatioFemale_var = 12.5 * femaleRate;
+    // const genderRatioMale_var = 12.5 * (8 - femaleRate);
+    // setGenderRatioFemale(genderRatioFemale_var);
+    // setGenderRatioMale(genderRatioMale_var);
+
+    //! to get the catchRate of Pokemon
+    //   const catchRate_var = Math.round((100 / 255) * res.data["capture_rate"]);
+    //   setCatchRate(catchRate_var);
+
+    //   //! to get the eggGroups of Pokemon
+    //   const eggGroups_var = res.data["egg_groups"]
+    //     .map((ele) => {
+    //       return ele.name
+    //         .toLowerCase()
+    //         .split(" ")
+    //         .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
+    //         .join(" ");
+    //     })
+    //     .join(", ");
+    //   setEggGroup(eggGroups_var);
+
+    //   //! to get the hatchSteps of Pokemon
+    //   const hatchSteps_var = 255 * (res.data["hatch_counter"] + 1);
+    //   setHatchSteps(hatchSteps_var);
+    // });
   };
 
   return (
