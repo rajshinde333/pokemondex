@@ -1,31 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import "./Pokemon.css";
 
-const TYPE_COLORS = {
-  bug: "B1C12E",
-  dark: "4F3A2D",
-  dragon: "755EDF",
-  electric: "FCBC17",
-  fairy: "F4B1F4",
-  fighting: "823551D",
-  fire: "E73B0C",
-  flying: "A3B3F7",
-  ghost: "6060B2",
-  grass: "74C236",
-  ground: "D3B357",
-  ice: "A3E7FD",
-  normal: "C8C4BC",
-  poison: "934594",
-  psychic: "ED4882",
-  rock: "B9A156",
-  steel: "B5B5C3",
-  water: "3295F6",
-};
-console.log(TYPE_COLORS["grass"]);
-
-const statTitleWidth = 2;
-const statBarWidth = 10;
+//todo Some Common constants
+const statTitleWidth = 3;
+const statBarWidth = 9;
 
 export default function Pokemon() {
   const [name, setName] = useState();
@@ -42,26 +22,23 @@ export default function Pokemon() {
   const [weight, setWeight] = useState();
   const [eggGroup, setEggGroup] = useState();
   const [abilities, setAbilities] = useState();
-  // const [gender, setGender] = useState();
   const [genderRatioMale, setGenderRatioMale] = useState();
   const [genderRatioFemale, setGenderRatioFemale] = useState();
   const [evs, setEvs] = useState();
   const [hatchSteps, setHatchSteps] = useState();
   const [catchRate, setCatchRate] = useState();
-  const [themeColor, setThemeColor] = useState();
 
   const location = useLocation();
   const { index } = location.state;
+
   useEffect(() => {
     getPokemonDetails(index.pokemonIndex);
-    // console.log(index.pokemonIndex);
   });
 
   const getPokemonDetails = async (index) => {
     const url = `https://pokeapi.co/api/v2/pokemon/${index}`;
 
     const result = await axios.get(url);
-    // console.log(result.data);
 
     setImageUrl(result.data.sprites.front_default);
 
@@ -72,19 +49,16 @@ export default function Pokemon() {
       .join(" ");
     setName(name);
 
-    //Convert Decimeter to Feet
+    //! Convert Decimeter to Feet
     const height =
       Math.round((result.data.height * 0.328084 + 0.0001) * 100) / 100;
     setHeight(height);
 
-    // Convert Hectogram to Kilogram
+    //! Convert Hectogram to Kilogram
     const weight = Math.round(result.data.weight / 10);
     setWeight(weight);
 
-    // console.log("height: ", height);
-    // console.log("weight: ", weight);
-    // console.log(imageUrl, weight);
-
+    //! To get Hp, Attack, Defense, Special-Attact, Special-Defense, Speed
     result.data.stats.map((stat) => {
       switch (stat.stat.name) {
         case "hp":
@@ -110,13 +84,7 @@ export default function Pokemon() {
       }
     });
 
-    //   const types_var = result.data.types.map((type) => type.type.name.toLowerCase()
-    //     .split("-")
-    //     .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
-    //     .join(" ");
-    // }).join(" ");
-
-    // get the type of pokemon
+    //! get the type of pokemon
     const types_var = result.data.types.map((type) => {
       return type.type.name
         .toLowerCase()
@@ -124,13 +92,9 @@ export default function Pokemon() {
         .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
         .join(" ");
     });
-    // .join(", ");
     setTypes(types_var);
 
-    const themeColor = TYPE_COLORS[types_var[types_var.length - 1]];
-    setThemeColor(themeColor);
-
-    // get the abilities of pokemon
+    //! get the abilities of pokemon
     const abilities_var = result.data.abilities
       .map((ability) => {
         return ability.ability.name
@@ -142,6 +106,7 @@ export default function Pokemon() {
       .join(", ");
     setAbilities(abilities_var);
 
+    //! To get Evs of Pokemon
     const evs_var = result.data.stats
       .filter((stat) => {
         if (stat.effort > 0) {
@@ -156,10 +121,9 @@ export default function Pokemon() {
           .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
           .join(" ");
       });
-    // .join(", ");
     setEvs(evs_var);
 
-    //to Get pokemon Description, catch rate, eggGroups, gendor and other
+    //! to Get pokemon Description/information
     const speciesUrl = `https://pokeapi.co/api/v2/pokemon-species/${index}`;
     await axios.get(speciesUrl).then((res) => {
       var description_var = "";
@@ -193,13 +157,20 @@ export default function Pokemon() {
       });
 
       description_var = description_var1 + description_var2 + description_var3;
+      setDescription(description_var);
 
+      //! to get femaleGenderRation, and MaleGenderRatio
       const femaleRate = res.data["gender_rate"];
       const genderRatioFemale_var = 12.5 * femaleRate;
       const genderRatioMale_var = 12.5 * (8 - femaleRate);
+      setGenderRatioFemale(genderRatioFemale_var);
+      setGenderRatioMale(genderRatioMale_var);
 
+      //! to get the catchRate of Pokemon
       const catchRate_var = Math.round((100 / 255) * res.data["capture_rate"]);
+      setCatchRate(catchRate_var);
 
+      //! to get the eggGroups of Pokemon
       const eggGroups_var = res.data["egg_groups"]
         .map((ele) => {
           return ele.name
@@ -209,98 +180,16 @@ export default function Pokemon() {
             .join(" ");
         })
         .join(", ");
-
-      const hatchSteps_var = 255 * (res.data["hatch_counter"] + 1);
-
-      setDescription(description_var);
-      setHatchSteps(hatchSteps_var);
       setEggGroup(eggGroups_var);
-      setGenderRatioFemale(genderRatioFemale_var);
-      setGenderRatioMale(genderRatioMale_var);
-      setCatchRate(catchRate_var);
-    });
-    // console.log("Weight - ", weight);
-    // console.log("height - ", height);
-    // console.log("types - ", types);
-    // console.log("description - ", description);
-    // console.log("hatchSteps - ", hatchSteps);
-    // console.log("eggGroup - ", eggGroup);
-    // console.log("genderRatioFemale - ", genderRatioFemale);
-    // console.log("genderRatioMale - ", genderRatioMale);
-    // console.log("catchRate - ", catchRate);
-    // console.log("attack - ", attack);
-    // console.log("hp - ", hp);
-    // console.log("defense - ", defense);
-    // console.log("speed - ", speed);
-    // console.log("specialAttack - ", specialAttack);
-    // console.log("specialDefense - ", specialDefense);
-    // console.log("abilities - ", abilities);
-    // console.log("evs - ", evs);
-    // {types.map((type) => (
-    //   console.log("color  ", TYPE_COLORS[type])
-    // )
 
-    types.map((type) => console.log("color  ", TYPE_COLORS[type]));
+      //! to get the hatchSteps of Pokemon
+      const hatchSteps_var = 255 * (res.data["hatch_counter"] + 1);
+      setHatchSteps(hatchSteps_var);
+    });
   };
 
   return (
     <>
-      {/* <h5>index: {index.pokemonIndex}</h5>
-      <h5>Weight: {weight}</h5>
-      <h5>height: {height}</h5>
-      <h5>types: {types}</h5>
-      <h5>description: {description}</h5>
-      <h5>hatchSteps: {hatchSteps}</h5>
-      <h5>Egg Group: {eggGroup}</h5>
-      <h5>gender Ratio Female: {genderRatioFemale}</h5>
-      <h5>gender Ratio Male: {genderRatioMale}</h5>
-      <h5>Catch Rate: {catchRate}</h5>
-      <h5>attack: {attack}</h5>
-      <h5>hp: {hp}</h5>
-      <h5>defense: {defense}</h5>
-      <h5>speed: {speed}</h5>
-      <h5>specialAttack: {specialAttack}</h5>
-      <h5>specialDefense: {specialDefense}</h5>
-      <h5>abilities: {abilities}</h5>
-      <h5>evs: {evs}</h5>
-
-      <img
-        className="card-img-top rounded mx-auto mt-2"
-        // onLoad={() => setImageLoading(() => false)}
-        src={imageUrl}
-        // style={imageLoading ? { display: "none" } : { display: "block" }}
-      ></img> */}
-      {/* <div className="col">
-        <div className="card">
-          <div className="card-header">
-            <div className="row">
-              <div className="col-5">
-                <h5>{index.pokemonIndex}</h5>
-              </div>
-              <div className="col-7">
-                <div className="float-right">
-                  {types.map((type) => (
-                    <span
-                      key={type}
-                      className="badge badge-pill mr-1 float-right"
-                      style={{
-                        backgroundColor: `{TYPE_COLORS[type]}`,
-                        color: "#000",
-                      }}
-                    >
-                      {type
-                        .toLowerCase()
-                        .split(" ")
-                        .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-                        .join(" ")}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <div className="col">
         <div className="card">
           <div className="card-header">
@@ -313,13 +202,12 @@ export default function Pokemon() {
                   {types.map((type) => (
                     <span
                       key={type}
-                      className="badge badge-pill mr-1"
+                      className={`badge rounded-pill ml-4 ${type}`}
                       style={{
-                        backgroundColor: `#${TYPE_COLORS[`${type}`]}`,
                         color: "#000",
+                        fontSize: 14,
                       }}
                     >
-                      {TYPE_COLORS[type]}
                       {type
                         .toLowerCase()
                         .split(" ")
@@ -342,9 +230,7 @@ export default function Pokemon() {
               <div className="col-md-9">
                 <h4 className="mx-auto mb-4">{name}</h4>
                 <div className="row align-items-center">
-                  <div className={`col-12 col-md-${statTitleWidth}`}>
-                    HP {themeColor}
-                  </div>
+                  <div className={`col-12 col-md-${statTitleWidth}`}>HP</div>
                   <div className={`col-12 col-md-${statBarWidth}`}>
                     <div className="progress">
                       <div
@@ -352,13 +238,13 @@ export default function Pokemon() {
                         role="progressbar"
                         style={{
                           width: `${hp}%`,
-                          // backgroundColor: `#${themeColor}`,
+                          backgroundColor: `#00FF00`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <small>{hp}</small>
+                        <big className="text-dark">{hp}</big>
                       </div>
                     </div>
                   </div>
@@ -374,13 +260,13 @@ export default function Pokemon() {
                         role="progressbar"
                         style={{
                           width: `${attack}%`,
-                          backgroundColor: `#${themeColor}`,
+                          backgroundColor: `#ff0000`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <small>{attack}</small>
+                        <big>{attack}</big>
                       </div>
                     </div>
                   </div>
@@ -396,13 +282,13 @@ export default function Pokemon() {
                         role="progressbar"
                         style={{
                           width: `${defense}%`,
-                          backgroundColor: `#${themeColor}`,
+                          backgroundColor: `#02D1FF`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <small>{defense}</small>
+                        <big className="text-dark">{defense}</big>
                       </div>
                     </div>
                   </div>
@@ -416,20 +302,20 @@ export default function Pokemon() {
                         role="progressbar"
                         style={{
                           width: `${speed}%`,
-                          backgroundColor: `#${themeColor}`,
+                          backgroundColor: `#F7FF00`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <small>{speed}</small>
+                        <big className="text-dark">{speed}</big>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="row align-items-center">
                   <div className={`col-12 col-md-${statTitleWidth}`}>
-                    Sp Atk
+                    Special Attack
                   </div>
                   <div className={`col-12 col-md-${statBarWidth}`}>
                     <div className="progress">
@@ -438,20 +324,20 @@ export default function Pokemon() {
                         role="progressbar"
                         style={{
                           width: `${specialAttack}%`,
-                          backgroundColor: `#${themeColor}`,
+                          backgroundColor: `#790000`,
                         }}
                         aria-valuenow={specialAttack}
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <small>{specialAttack}</small>
+                        <big className="text-white">{specialAttack}</big>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div className="row align-items-center">
                   <div className={`col-12 col-md-${statTitleWidth}`}>
-                    Sp Def
+                    Special Defense
                   </div>
                   <div className={`col-12 col-md-${statBarWidth}`}>
                     <div className="progress">
@@ -460,13 +346,13 @@ export default function Pokemon() {
                         role="progressbar"
                         style={{
                           width: `${specialDefense}%`,
-                          backgroundColor: `#${themeColor}`,
+                          backgroundColor: `#0247FF`,
                         }}
                         aria-valuenow={specialDefense}
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <small>{specialDefense}</small>
+                        <big>{specialDefense}</big>
                       </div>
                     </div>
                   </div>
@@ -481,7 +367,9 @@ export default function Pokemon() {
           </div>
           <hr />
           <div className="card-body">
-            <h5 className="card-title text-center">Profile</h5>
+            <h5 className="card-title text-center">
+              <b>Profile</b>
+            </h5>
             <div className="row">
               <div className="col-md-6">
                 <div className="row">
@@ -559,7 +447,7 @@ export default function Pokemon() {
                     <h6 className="float-start">{abilities}</h6>
                   </div>
                   <div className="col-6">
-                    <h6 className="float-end">EVs:</h6>
+                    <h6 className="float-end">Evs:</h6>
                   </div>
                   <div className="col-6">
                     <h6 className="float-start">{evs}</h6>
