@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import axios from "axios";
+import styled from "styled-components";
 import "./Pokemon.css";
+import loader from "./pokeball-16841.png";
 
 //todo Some Common constants
 const statTitleWidth = 3;
 const statBarWidth = 9;
 
+const Sprite = styled.img`
+  width: 13em;
+  height: 13em;
+  display: none;
+`;
+
 export default function Pokemon() {
+  const [imageLoading, setImageLoading] = useState(true);
+  const [imageLoading1, setImageLoading1] = useState(true);
+  const [imageLoading2, setImageLoading2] = useState(true);
+  const [imageLoading3, setImageLoading3] = useState(true);
   const [name, setName] = useState();
   const [imageUrl, setImageUrl] = useState();
   const [types, setTypes] = useState([]);
@@ -27,6 +39,13 @@ export default function Pokemon() {
   const [evs, setEvs] = useState();
   const [hatchSteps, setHatchSteps] = useState();
   const [catchRate, setCatchRate] = useState();
+  // const [evolutionImages, setEvolutionImages] = useState([]);
+  const [evoImage1, setEvoImage1] = useState();
+  const [evoImage2, setEvoImage2] = useState();
+  const [evoImage3, setEvoImage3] = useState();
+  const [evoName1, setEvoName1] = useState();
+  const [evoName2, setEvoName2] = useState();
+  const [evoName3, setEvoName3] = useState();
 
   const location = useLocation();
   const { index } = location.state;
@@ -187,6 +206,71 @@ export default function Pokemon() {
     const hatchSteps_var = 255 * (speciesRes.data["hatch_counter"] + 1);
     setHatchSteps(hatchSteps_var);
 
+    //!to get the evolution images of this pokemon
+    const evoUrl = speciesRes.data["evolution_chain"].url;
+    const evoRes = await axios.get(evoUrl);
+    var evoData = evoRes.data.chain;
+    var EvoChain = [];
+    do {
+      // if (evoData.species.name !== result.data.name) {
+      EvoChain.push({
+        name: evoData.species.name,
+      });
+      // }
+      evoData = evoData["evolves_to"][0];
+    } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
+
+    const EvoName1 = EvoChain[0].name
+      .toLowerCase()
+      .split("-")
+      .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
+      .join(" ");
+
+    setEvoName1(EvoName1);
+
+    const EvoName2 = EvoChain[1].name
+      .toLowerCase()
+      .split("-")
+      .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
+      .join(" ");
+
+    setEvoName2(EvoName2);
+
+    const EvoName3 = EvoChain[2].name
+      .toLowerCase()
+      .split("-")
+      .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
+      .join(" ");
+
+    setEvoName3(EvoName3);
+
+    const GetImageUrl1 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[0].name}`;
+    const evolutionRes1 = await axios.get(GetImageUrl1);
+
+    setEvoImage1(evolutionRes1.data.sprites.front_default);
+
+    const GetImageUrl2 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[1].name}`;
+    const evolutionRes2 = await axios.get(GetImageUrl2);
+    setEvoImage2(evolutionRes2.data.sprites.front_default);
+
+    const GetImageUrl3 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[2].name}`;
+    const evolutionRes3 = await axios.get(GetImageUrl3);
+    setEvoImage3(evolutionRes3.data.sprites.front_default);
+
+    // const EvolutionImages = EvoChain.map((ele) => {
+    //   const GetImageUrl = `https://pokeapi.co/api/v2/pokemon/${ele.name}`;
+    //   const evoImageRes = axios.get(GetImageUrl);
+    //   console.log(evoImageRes);
+    //   return evoImageRes.data.sprites.front_default;
+    // });
+
+    // console.log(EvolutionImages);
+
+    // EvoChain;
+
+    // const SecondEvolution = evoRes.data["chain"].evolves_to["species"].name;
+    // console.log(SecondEvolution);
+
     // await axios.get(speciesUrl).then((res) => {
     // var description_var = "";
     // var description_var1 = "";
@@ -283,11 +367,24 @@ export default function Pokemon() {
           </div>
           <div className="card-body">
             <div className="row align-items-center">
-              <div className="col-md-3">
-                <img
+              <div className="col-md-3 text-center">
+                {imageLoading ? (
+                  <img
+                    src={loader}
+                    style={{ width: "3em", height: "3em" }}
+                    id="poke"
+                    className="card-img-top rounded mx-auto mt-4"
+                    alt="pokemon Images"
+                  ></img>
+                ) : null}
+                <Sprite
                   className="card-img-top rounded mx-auto mt-2 image-fluid"
+                  onLoad={() => setImageLoading(() => false)}
                   src={imageUrl}
-                ></img>
+                  style={
+                    imageLoading ? { display: "none" } : { display: "block" }
+                  }
+                ></Sprite>
               </div>
               <div className="col-md-9">
                 <h4 className="mx-auto mb-4">{name}</h4>
@@ -427,11 +524,12 @@ export default function Pokemon() {
               </div>
             </div>
           </div>
-          <hr />
           <div className="card-body">
+            <hr />
             <h5 className="card-title text-center">
               <b>Profile</b>
             </h5>
+            <hr />
             <div className="row">
               <div className="col-md-6">
                 <div className="row">
@@ -515,6 +613,103 @@ export default function Pokemon() {
                     <h6 className="float-start">{evs}</h6>
                   </div>
                 </div>
+              </div>
+            </div>
+            <hr />
+            <h5 className="card-title text-center">
+              <b>Evolution Chain</b>
+            </h5>
+            <hr />
+            <div className="row align-items-center">
+              <div className="col-md-4 text-center">
+                {imageLoading1 ? (
+                  <>
+                    <img
+                      src={loader}
+                      style={{ width: "3em", height: "3em" }}
+                      id="poke"
+                      className="card-img-top rounded mx-auto mt-4"
+                      alt="pokemon Images"
+                    ></img>
+                    <br />
+                    <br />
+                    <span className="text-danger">
+                      <b>Loading</b>
+                    </span>
+                  </>
+                ) : null}
+                <Sprite
+                  className="card-img-top rounded mx-auto mt-2 image-fluid"
+                  onLoad={() => setImageLoading1(() => false)}
+                  src={evoImage1}
+                  style={
+                    imageLoading1 ? { display: "none" } : { display: "block" }
+                  }
+                ></Sprite>
+                <br />
+                <span>
+                  <b>{evoName1}</b>
+                </span>
+              </div>
+              <div className="col-md-4 text-center">
+                {imageLoading2 ? (
+                  <>
+                    <img
+                      src={loader}
+                      style={{ width: "3em", height: "3em" }}
+                      id="poke"
+                      className="card-img-top rounded mx-auto mt-4"
+                      alt="pokemon Images"
+                    ></img>
+                    <br />
+                    <br />
+                    <span className="text-danger">
+                      <b>Loading</b>
+                    </span>
+                  </>
+                ) : null}
+                <Sprite
+                  className="card-img-top rounded mx-auto mt-2 image-fluid"
+                  onLoad={() => setImageLoading2(() => false)}
+                  src={evoImage2}
+                  style={
+                    imageLoading2 ? { display: "none" } : { display: "block" }
+                  }
+                ></Sprite>
+                <br />
+                <span>
+                  <b>{evoName2}</b>
+                </span>
+              </div>
+              <div className="col-md-4 text-center">
+                {imageLoading3 ? (
+                  <>
+                    <img
+                      src={loader}
+                      style={{ width: "3em", height: "3em" }}
+                      id="poke"
+                      className="card-img-top rounded mx-auto mt-4"
+                      alt="pokemon Images"
+                    ></img>
+                    <br />
+                    <br />
+                    <span className="text-danger">
+                      <b>Loading</b>
+                    </span>
+                  </>
+                ) : null}
+                <Sprite
+                  className="card-img-top rounded mx-auto mt-2 image-fluid"
+                  onLoad={() => setImageLoading3(() => false)}
+                  src={evoImage3}
+                  style={
+                    imageLoading3 ? { display: "none" } : { display: "block" }
+                  }
+                ></Sprite>
+                <br />
+                <span>
+                  <b>{evoName3}</b>
+                </span>
               </div>
             </div>
           </div>
