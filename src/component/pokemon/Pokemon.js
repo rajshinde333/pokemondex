@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
+import { Link } from "react-router-dom";
 import "./Pokemon.css";
 import loader from "./pokeball-16841.png";
 
@@ -15,7 +16,27 @@ const Sprite = styled.img`
   display: none;
 `;
 
-export default function Pokemon() {
+const StyledLink = styled(Link)`
+  text-decoration: none;
+  color: #000;
+  &:hover,
+  &:active {
+    color: #000;
+  }
+`;
+
+export default function Pokemon(props) {
+  function GoBack() {
+    return <Navigate to="/" />;
+  }
+
+  window.addEventListener("popstate", (event) => {
+    GoBack();
+  });
+
+  const onNavigate = (history, locationDescriptor) =>
+    history.replace(locationDescriptor);
+
   const [imageLoading, setImageLoading] = useState(true);
   const [imageLoading1, setImageLoading1] = useState(true);
   const [imageLoading2, setImageLoading2] = useState(true);
@@ -39,13 +60,15 @@ export default function Pokemon() {
   const [evs, setEvs] = useState();
   const [hatchSteps, setHatchSteps] = useState();
   const [catchRate, setCatchRate] = useState();
-  // const [evolutionImages, setEvolutionImages] = useState([]);
   const [evoImage1, setEvoImage1] = useState();
   const [evoImage2, setEvoImage2] = useState();
   const [evoImage3, setEvoImage3] = useState();
   const [evoName1, setEvoName1] = useState();
   const [evoName2, setEvoName2] = useState();
   const [evoName3, setEvoName3] = useState();
+  const [evoId1, setEvoId1] = useState();
+  const [evoId2, setEvoId2] = useState();
+  const [evoId3, setEvoId3] = useState();
 
   const location = useLocation();
   const { index } = location.state;
@@ -208,15 +231,14 @@ export default function Pokemon() {
 
     //!to get the evolution images of this pokemon
     const evoUrl = speciesRes.data["evolution_chain"].url;
+    // console.log(evoUrl);
     const evoRes = await axios.get(evoUrl);
     var evoData = evoRes.data.chain;
     var EvoChain = [];
     do {
-      // if (evoData.species.name !== result.data.name) {
       EvoChain.push({
         name: evoData.species.name,
       });
-      // }
       evoData = evoData["evolves_to"][0];
     } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
 
@@ -246,16 +268,20 @@ export default function Pokemon() {
 
     const GetImageUrl1 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[0].name}`;
     const evolutionRes1 = await axios.get(GetImageUrl1);
-
     setEvoImage1(evolutionRes1.data.sprites.front_default);
+    setEvoId1(evolutionRes1.data.id);
 
     const GetImageUrl2 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[1].name}`;
     const evolutionRes2 = await axios.get(GetImageUrl2);
     setEvoImage2(evolutionRes2.data.sprites.front_default);
+    setEvoId2(evolutionRes2.data.id);
 
     const GetImageUrl3 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[2].name}`;
     const evolutionRes3 = await axios.get(GetImageUrl3);
     setEvoImage3(evolutionRes3.data.sprites.front_default);
+    setEvoId3(evolutionRes3.data.id);
+
+    console.log(evoId1, evoId2, evoId3);
 
     // const EvolutionImages = EvoChain.map((ele) => {
     //   const GetImageUrl = `https://pokeapi.co/api/v2/pokemon/${ele.name}`;
@@ -518,7 +544,7 @@ export default function Pokemon() {
                 </div>
               </div>
             </div>
-            <div className="row mt-1">
+            <div className="row mt-4">
               <div className="col">
                 <p className="">{description}</p>
               </div>
@@ -638,18 +664,28 @@ export default function Pokemon() {
                     </span>
                   </>
                 ) : null}
-                <Sprite
-                  className="card-img-top rounded mx-auto mt-2 image-fluid"
-                  onLoad={() => setImageLoading1(() => false)}
-                  src={evoImage1}
-                  style={
-                    imageLoading1 ? { display: "none" } : { display: "block" }
-                  }
-                ></Sprite>
-                <br />
-                <span>
-                  <b>{evoName1}</b>
-                </span>
+                <StyledLink
+                  to={{
+                    pathname: `/pokemon/${evoId1}`,
+                  }}
+                  state={{
+                    index: { pokemonIndex: evoId1 },
+                  }}
+                  // onNavigate={onNavigate}
+                >
+                  <Sprite
+                    className="card-img-top rounded mx-auto mt-2 image-fluid"
+                    onLoad={() => setImageLoading1(() => false)}
+                    src={evoImage1}
+                    style={
+                      imageLoading1 ? { display: "none" } : { display: "block" }
+                    }
+                  ></Sprite>
+                  <br />
+                  <span>
+                    <b>{evoName1}</b>
+                  </span>
+                </StyledLink>
               </div>
               <div className="col-md-4 text-center">
                 {imageLoading2 ? (
@@ -668,19 +704,30 @@ export default function Pokemon() {
                     </span>
                   </>
                 ) : null}
-                <Sprite
-                  className="card-img-top rounded mx-auto mt-2 image-fluid"
-                  onLoad={() => setImageLoading2(() => false)}
-                  src={evoImage2}
-                  style={
-                    imageLoading2 ? { display: "none" } : { display: "block" }
-                  }
-                ></Sprite>
-                <br />
-                <span>
-                  <b>{evoName2}</b>
-                </span>
+                <StyledLink
+                  to={{
+                    pathname: `/pokemon/${evoId2}`,
+                  }}
+                  state={{
+                    index: { pokemonIndex: evoId2 },
+                  }}
+                  // onNavigate={onNavigate}
+                >
+                  <Sprite
+                    className="card-img-top rounded mx-auto mt-2 image-fluid"
+                    onLoad={() => setImageLoading2(() => false)}
+                    src={evoImage2}
+                    style={
+                      imageLoading2 ? { display: "none" } : { display: "block" }
+                    }
+                  ></Sprite>
+                  <br />
+                  <span>
+                    <b>{evoName2}</b>
+                  </span>
+                </StyledLink>
               </div>
+
               <div className="col-md-4 text-center">
                 {imageLoading3 ? (
                   <>
@@ -695,21 +742,31 @@ export default function Pokemon() {
                     <br />
                     <span className="text-danger">
                       <b>Loading</b>
+                      <br />
                     </span>
                   </>
                 ) : null}
-                <Sprite
-                  className="card-img-top rounded mx-auto mt-2 image-fluid"
-                  onLoad={() => setImageLoading3(() => false)}
-                  src={evoImage3}
-                  style={
-                    imageLoading3 ? { display: "none" } : { display: "block" }
-                  }
-                ></Sprite>
-                <br />
-                <span>
-                  <b>{evoName3}</b>
-                </span>
+                <StyledLink
+                  to={{
+                    pathname: `/pokemon/${evoId3}`,
+                  }}
+                  state={{
+                    index: { pokemonIndex: evoId3 },
+                  }}
+                  // onNavigate={onNavigate}
+                >
+                  <Sprite
+                    className="card-img-top rounded mx-auto mt-2 image-fluid"
+                    onLoad={() => setImageLoading3(() => false)}
+                    src={evoImage3}
+                    style={
+                      imageLoading3 ? { display: "none" } : { display: "block" }
+                    }
+                  ></Sprite>
+                  <span>
+                    <b>{evoName3}</b>
+                  </span>
+                </StyledLink>
               </div>
             </div>
           </div>

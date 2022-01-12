@@ -41,14 +41,14 @@ export default function PokemonCard(props) {
   });
 
   const getPokemon = async (data) => {
-    //to get the pokemon image url from json
+    //todo    to get the pokemon image url from json
     setPokemonImageUrl(data.sprites.front_default);
 
-    //to get the pokemon card color as per their abilities and colors
+    //todo    to get the pokemon card color as per their abilities and colors
     const CardColor = await axios.get(data.species.url);
     setColor(CardColor.data.color.name);
 
-    //to get the pokemon index as a id for redirecting them from json
+    //todo    to get the pokemon index as a id for redirecting them from json
     const indexURL = data.location_area_encounters;
     const index = indexURL.split("/")[indexURL.split("/").length - 2];
     setPokemonIndex(index);
@@ -62,7 +62,7 @@ export default function PokemonCard(props) {
           pathname: `pokemon/${pokemonIndex}`,
         }}
         state={{
-          index: { pokemonIndex },
+          index: { pokemonIndex: pokemonIndex },
         }}
       >
         <PokeCard className={`card ${color}`}>
@@ -93,7 +93,7 @@ export default function PokemonCard(props) {
                 )
                 .join(" ")}
               <br />
-              {pokemonIndex}
+              {/* {pokemonIndex} */}
             </h6>
           </div>
         </PokeCard>
