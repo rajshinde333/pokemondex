@@ -1,5 +1,6 @@
 import React from "react";
 import pikachuface from "./pikachuface.png";
+import pokeDex from "./PokeDex.png";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 
@@ -11,24 +12,26 @@ export default function Navbar() {
   }
   return (
     <div>
-      <nav className="navbar navbar-expand-lg fixed-top">
+      <nav className="navbar navbar-expand-lg fixed-top d-flex justify-content-between">
         <a
           className="navbar-brand col-sm-3 col-md-2 mr-0 align-items-center text-white"
           href="/"
         >
-          PokeDex
+          <img
+            src={pokeDex}
+            style={{ width: "8em", height: "2.5em" }}
+            alt="Pikachu"
+          />
           <img
             src={pikachuface}
-            style={{ width: "1.5em", height: "1.8em" }}
+            style={{ width: "2em", height: "3em" }}
             alt="Pikachu"
           />
         </a>
         {window.location.pathname.match("/pokemon/") ? (
-          <div className="float-end">
-            <button className="btn btn-primary" type="button" onClick={GoBack}>
-              Go Back
-            </button>
-          </div>
+          <button className="btn btn-primary" type="button" onClick={GoBack}>
+            Go Back
+          </button>
         ) : null}
       </nav>
     </div>

@@ -1,10 +1,15 @@
-@font-face {
+/* @font-face {
   font-family: "whoody";
-  src: local("whoody"), url("../../fonts/whoody.ttf") format("truetype");
+  src: local("whoody"), url("../../fonts/PocketMonk.ttf") format("truetype");
   font-weight: bold;
 }
 
 .navbar-brand {
   font-family: "whoody", sans-serif;
   letter-spacing: 5px;
+  font-size: 23px;
+} */
+
+.btn {
+  margin-right: 15px;
 }
