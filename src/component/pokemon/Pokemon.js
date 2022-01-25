@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
@@ -11,8 +11,8 @@ const statTitleWidth = 3;
 const statBarWidth = 9;
 
 const Sprite = styled.img`
-  width: 13em;
-  height: 13em;
+  width: 10em;
+  height: 10em;
   display: none;
 `;
 
@@ -26,31 +26,17 @@ const StyledLink = styled(Link)`
 `;
 
 export default function Pokemon(props) {
-  function GoBack() {
-    return <Navigate to="/" />;
-  }
-
-  window.addEventListener("popstate", (event) => {
-    GoBack();
-  });
-
-  const onNavigate = (history, locationDescriptor) =>
-    history.replace(locationDescriptor);
-
   const [imageLoading, setImageLoading] = useState(true);
   const [imageLoading1, setImageLoading1] = useState(true);
   const [imageLoading2, setImageLoading2] = useState(true);
   const [imageLoading3, setImageLoading3] = useState(true);
   const [name, setName] = useState();
   const [imageUrl, setImageUrl] = useState();
+  const [backImageUrl, setBackImageUrl] = useState();
+  const [backGroundImg, setBackGroundImg] = useState();
   const [types, setTypes] = useState([]);
   const [description, setDescription] = useState();
-  const [hp, setHp] = useState();
-  const [attack, setAttack] = useState();
-  const [defense, setDefense] = useState();
-  const [speed, setSpeed] = useState();
-  const [specialAttack, setSpecialAttack] = useState();
-  const [specialDefense, setSpecialDefense] = useState();
+  const [properties, setProperties] = useState([]);
   const [height, setHeight] = useState();
   const [weight, setWeight] = useState();
   const [eggGroup, setEggGroup] = useState();
@@ -60,15 +46,8 @@ export default function Pokemon(props) {
   const [evs, setEvs] = useState();
   const [hatchSteps, setHatchSteps] = useState();
   const [catchRate, setCatchRate] = useState();
-  const [evoImage1, setEvoImage1] = useState();
-  const [evoImage2, setEvoImage2] = useState();
-  const [evoImage3, setEvoImage3] = useState();
-  const [evoName1, setEvoName1] = useState();
-  const [evoName2, setEvoName2] = useState();
-  const [evoName3, setEvoName3] = useState();
-  const [evoId1, setEvoId1] = useState();
-  const [evoId2, setEvoId2] = useState();
-  const [evoId3, setEvoId3] = useState();
+  const [evoNames, setEvonames] = useState([]);
+  const [evoId, setEvoid] = useState([]);
 
   const location = useLocation();
   const { index } = location.state;
@@ -82,8 +61,18 @@ export default function Pokemon(props) {
 
     const result = await axios.get(url);
 
+    //todo get Front image of pokemon
     setImageUrl(result.data.sprites.front_default);
 
+    //todo get back image of pokemon
+    setBackImageUrl(result.data.sprites.back_default);
+
+    //todo get background image of pokemon
+    setBackGroundImg(
+      result.data.sprites.other["official-artwork"].front_default
+    );
+
+    //todo get nameo of the pokemon
     const name = result.data.name
       .toLowerCase()
       .split("-")
@@ -104,22 +93,22 @@ export default function Pokemon(props) {
     result.data.stats.map((stat) => {
       switch (stat.stat.name) {
         case "hp":
-          setHp(stat["base_stat"]);
+          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
           break;
         case "attack":
-          setAttack(stat["base_stat"]);
+          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
           break;
         case "defense":
-          setDefense(stat["base_stat"]);
+          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
           break;
         case "special-attack":
-          setSpecialAttack(stat["base_stat"]);
+          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
           break;
         case "special-defense":
-          setSpecialDefense(stat["base_stat"]);
+          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
           break;
         case "speed":
-          setSpeed(stat["base_stat"]);
+          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
           break;
         default:
           console.log("default");
@@ -231,139 +220,34 @@ export default function Pokemon(props) {
 
     //!to get the evolution images of this pokemon
     const evoUrl = speciesRes.data["evolution_chain"].url;
-    // console.log(evoUrl);
     const evoRes = await axios.get(evoUrl);
     var evoData = evoRes.data.chain;
-    var EvoChain = [];
+    var evoChain = [];
     do {
-      EvoChain.push({
+      evoChain.push({
         name: evoData.species.name,
+        url: evoData.species.url,
       });
       evoData = evoData["evolves_to"][0];
     } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
 
-    const EvoName1 = EvoChain[0].name
-      .toLowerCase()
-      .split("-")
-      .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
-      .join(" ");
+    const idRegEx = /[0-9]+/g;
+    evoChain.map((ele) => {
+      setEvonames((prevEle) => [...prevEle, ele.name]);
+      const evoId = ele.url.match(idRegEx);
+      setEvoid((prevEle) => [...prevEle, evoId[1]]);
+    });
 
-    setEvoName1(EvoName1);
-
-    const EvoName2 = EvoChain[1].name
-      .toLowerCase()
-      .split("-")
-      .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
-      .join(" ");
-
-    setEvoName2(EvoName2);
-
-    const EvoName3 = EvoChain[2].name
-      .toLowerCase()
-      .split("-")
-      .map((string) => string.charAt(0).toUpperCase() + string.substring(1))
-      .join(" ");
-
-    setEvoName3(EvoName3);
-
-    const GetImageUrl1 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[0].name}`;
-    const evolutionRes1 = await axios.get(GetImageUrl1);
-    setEvoImage1(evolutionRes1.data.sprites.front_default);
-    setEvoId1(evolutionRes1.data.id);
-
-    const GetImageUrl2 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[1].name}`;
-    const evolutionRes2 = await axios.get(GetImageUrl2);
-    setEvoImage2(evolutionRes2.data.sprites.front_default);
-    setEvoId2(evolutionRes2.data.id);
-
-    const GetImageUrl3 = `https://pokeapi.co/api/v2/pokemon/${EvoChain[2].name}`;
-    const evolutionRes3 = await axios.get(GetImageUrl3);
-    setEvoImage3(evolutionRes3.data.sprites.front_default);
-    setEvoId3(evolutionRes3.data.id);
-
-    console.log(evoId1, evoId2, evoId3);
-
-    // const EvolutionImages = EvoChain.map((ele) => {
-    //   const GetImageUrl = `https://pokeapi.co/api/v2/pokemon/${ele.name}`;
-    //   const evoImageRes = axios.get(GetImageUrl);
-    //   console.log(evoImageRes);
-    //   return evoImageRes.data.sprites.front_default;
-    // });
-
-    // console.log(EvolutionImages);
-
-    // EvoChain;
-
-    // const SecondEvolution = evoRes.data["chain"].evolves_to["species"].name;
-    // console.log(SecondEvolution);
-
-    // await axios.get(speciesUrl).then((res) => {
-    // var description_var = "";
-    // var description_var1 = "";
-    // var description_var2 = "";
-    // var description_var3 = "";
-    // res.data.flavor_text_entries.some((ele) => {
-    //   if (ele.language.name === "en") {
-    //     description_var1 = ele.flavor_text;
-    //     return;
-    //   }
-    // });
-    // res.data.flavor_text_entries.some((ele) => {
-    //   if (
-    //     ele.language.name === "en" &&
-    //     description_var1 !== ele.flavor_text
-    //   ) {
-    //     description_var2 = ele.flavor_text;
-    //     return;
-    //   }
-    // });
-    // res.data.flavor_text_entries.some((ele) => {
-    //   if (
-    //     ele.language.name === "en" &&
-    //     description_var1 !== ele.flavor_text &&
-    //     description_var2 !== ele.flavor_text
-    //   ) {
-    //     description_var3 = ele.flavor_text;
-    //     return;
-    //   }
-    // });
-
-    // description_var = description_var1 + description_var2 + description_var3;
-    // setDescription(description_var);
-
-    // //! to get femaleGenderRation, and MaleGenderRatio
-    // const femaleRate = res.data["gender_rate"];
-    // const genderRatioFemale_var = 12.5 * femaleRate;
-    // const genderRatioMale_var = 12.5 * (8 - femaleRate);
-    // setGenderRatioFemale(genderRatioFemale_var);
-    // setGenderRatioMale(genderRatioMale_var);
-
-    //! to get the catchRate of Pokemon
-    //   const catchRate_var = Math.round((100 / 255) * res.data["capture_rate"]);
-    //   setCatchRate(catchRate_var);
-
-    //   //! to get the eggGroups of Pokemon
-    //   const eggGroups_var = res.data["egg_groups"]
-    //     .map((ele) => {
-    //       return ele.name
-    //         .toLowerCase()
-    //         .split(" ")
-    //         .map((s) => s.charAt(0).toUpperCase() + s.substring(1))
-    //         .join(" ");
-    //     })
-    //     .join(", ");
-    //   setEggGroup(eggGroups_var);
-
-    //   //! to get the hatchSteps of Pokemon
-    //   const hatchSteps_var = 255 * (res.data["hatch_counter"] + 1);
-    //   setHatchSteps(hatchSteps_var);
-    // });
+    // do {
+    //   setEvonames((prevEle) => [...prevEle, evoData.species.name]);
+    //   evoData = evoData["evolves_to"][0];
+    // } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
   };
 
   return (
     <>
       <div className="col">
-        <div className="card">
+        <div className="card Bground">
           <div className="card-header">
             <div className="row">
               <div className="col-5">
@@ -412,7 +296,7 @@ export default function Pokemon(props) {
                   }
                 ></Sprite>
               </div>
-              <div className="col-md-9">
+              <div className="col-md-6">
                 <h4 className="mx-auto mb-4">{name}</h4>
                 <div className="row align-items-center">
                   <div className={`col-12 col-md-${statTitleWidth}`}>HP</div>
@@ -422,14 +306,14 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${hp}%`,
+                          width: `${properties[0]}%`,
                           backgroundColor: `#00FF00`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-dark">{hp}</big>
+                        <big className="text-dark">{properties[0]}</big>
                       </div>
                     </div>
                   </div>
@@ -444,14 +328,14 @@ export default function Pokemon(props) {
                         className="progress-bar"
                         role="progressbar"
                         style={{
-                          width: `${attack}%`,
+                          width: `${properties[1]}%`,
                           backgroundColor: `#ff0000`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big>{attack}</big>
+                        <big>{properties[1]}</big>
                       </div>
                     </div>
                   </div>
@@ -466,14 +350,14 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${defense}%`,
+                          width: `${properties[2]}%`,
                           backgroundColor: `#02D1FF`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-dark">{defense}</big>
+                        <big className="text-dark">{properties[2]}</big>
                       </div>
                     </div>
                   </div>
@@ -486,14 +370,14 @@ export default function Pokemon(props) {
                         className="progress-bar"
                         role="progressbar"
                         style={{
-                          width: `${speed}%`,
+                          width: `${properties[5]}%`,
                           backgroundColor: `#F7FF00`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-dark">{speed}</big>
+                        <big className="text-dark">{properties[5]}</big>
                       </div>
                     </div>
                   </div>
@@ -508,14 +392,14 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${specialAttack}%`,
+                          width: `${properties[3]}%`,
                           backgroundColor: `#790000`,
                         }}
-                        aria-valuenow={specialAttack}
+                        aria-valuenow={properties[3]}
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-white">{specialAttack}</big>
+                        <big className="text-white">{properties[3]}</big>
                       </div>
                     </div>
                   </div>
@@ -530,18 +414,37 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${specialDefense}%`,
+                          width: `${properties[4]}%`,
                           backgroundColor: `#0247FF`,
                         }}
-                        aria-valuenow={specialDefense}
+                        aria-valuenow={properties[4]}
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big>{specialDefense}</big>
+                        <big>{properties[4]}</big>
                       </div>
                     </div>
                   </div>
                 </div>
+              </div>
+              <div className="col-md-3 text-center">
+                {imageLoading ? (
+                  <img
+                    src={loader}
+                    style={{ width: "3em", height: "3em" }}
+                    id="poke"
+                    className="card-img-top rounded mx-auto mt-4"
+                    alt="pokemon Images"
+                  ></img>
+                ) : null}
+                <Sprite
+                  className="card-img-top rounded mx-auto mt-2 image-fluid"
+                  onLoad={() => setImageLoading(() => false)}
+                  src={backImageUrl}
+                  style={
+                    imageLoading ? { display: "none" } : { display: "block" }
+                  }
+                ></Sprite>
               </div>
             </div>
             <div className="row mt-4">
@@ -666,24 +569,23 @@ export default function Pokemon(props) {
                 ) : null}
                 <StyledLink
                   to={{
-                    pathname: `/pokemon/${evoId1}`,
+                    pathname: `/pokemon/${evoId[0]}`,
                   }}
                   state={{
-                    index: { pokemonIndex: evoId1 },
+                    index: { pokemonIndex: evoId[0] },
                   }}
-                  // onNavigate={onNavigate}
                 >
                   <Sprite
                     className="card-img-top rounded mx-auto mt-2 image-fluid"
                     onLoad={() => setImageLoading1(() => false)}
-                    src={evoImage1}
+                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[0]}.png`}
                     style={
                       imageLoading1 ? { display: "none" } : { display: "block" }
                     }
                   ></Sprite>
                   <br />
                   <span>
-                    <b>{evoName1}</b>
+                    <b>{evoNames[0]}</b>
                   </span>
                 </StyledLink>
               </div>
@@ -706,24 +608,23 @@ export default function Pokemon(props) {
                 ) : null}
                 <StyledLink
                   to={{
-                    pathname: `/pokemon/${evoId2}`,
+                    pathname: `/pokemon/${evoId[1]}`,
                   }}
                   state={{
-                    index: { pokemonIndex: evoId2 },
+                    index: { pokemonIndex: evoId[1] },
                   }}
-                  // onNavigate={onNavigate}
                 >
                   <Sprite
                     className="card-img-top rounded mx-auto mt-2 image-fluid"
                     onLoad={() => setImageLoading2(() => false)}
-                    src={evoImage2}
+                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[1]}.png`}
                     style={
                       imageLoading2 ? { display: "none" } : { display: "block" }
                     }
                   ></Sprite>
                   <br />
                   <span>
-                    <b>{evoName2}</b>
+                    <b>{evoNames[1]}</b>
                   </span>
                 </StyledLink>
               </div>
@@ -748,29 +649,28 @@ export default function Pokemon(props) {
                 ) : null}
                 <StyledLink
                   to={{
-                    pathname: `/pokemon/${evoId3}`,
+                    pathname: `/pokemon/${evoId[2]}`,
                   }}
                   state={{
-                    index: { pokemonIndex: evoId3 },
+                    index: { pokemonIndex: evoId[2] },
                   }}
-                  // onNavigate={onNavigate}
                 >
                   <Sprite
                     className="card-img-top rounded mx-auto mt-2 image-fluid"
                     onLoad={() => setImageLoading3(() => false)}
-                    src={evoImage3}
+                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[2]}.png`}
                     style={
                       imageLoading3 ? { display: "none" } : { display: "block" }
                     }
                   ></Sprite>
                   <span>
-                    <b>{evoName3}</b>
+                    <b>{evoNames[2]}</b>
                   </span>
                 </StyledLink>
               </div>
             </div>
           </div>
-          <div className="card-footer text-muted">
+          <div className="card-footer text-muted text-center">
             Data From{" "}
             <a href="https://pokeapi.co/" target="_blank" className="card-link">
               PokeAPI.co

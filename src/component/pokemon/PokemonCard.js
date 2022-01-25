@@ -42,7 +42,10 @@ export default function PokemonCard(props) {
 
   const getPokemon = async (data) => {
     //todo    to get the pokemon image url from json
-    setPokemonImageUrl(data.sprites.front_default);
+    // setPokemonImageUrl(data.sprites.front_default);
+    setPokemonImageUrl(
+      `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonIndex}.png`
+    );
 
     //todo    to get the pokemon card color as per their abilities and colors
     const CardColor = await axios.get(data.species.url);

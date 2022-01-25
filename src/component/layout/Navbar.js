@@ -2,7 +2,7 @@ import React from "react";
 import pikachuface from "./pikachuface.png";
 import pokeDex from "./PokeDex.png";
 import "./Navbar.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Navbar() {
   let history = useNavigate();
@@ -29,9 +29,15 @@ export default function Navbar() {
           />
         </a>
         {window.location.pathname.match("/pokemon/") ? (
-          <button className="btn btn-primary" type="button" onClick={GoBack}>
-            Go Back
-          </button>
+          <Link
+            to={{
+              pathname: "/",
+            }}
+          >
+            <button className="btn btn-primary" type="button">
+              Go Back
+            </button>
+          </Link>
         ) : null}
       </nav>
     </div>
