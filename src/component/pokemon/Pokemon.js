@@ -3,8 +3,8 @@ import { useLocation } from "react-router-dom";
 import axios from "axios";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import "./Pokemon.css";
-import loader from "./pokeball-16841.png";
+import "../../css/Pokemon.css";
+import loader from "../../images/pokeball-16841.png";
 
 //todo Some Common constants
 const statTitleWidth = 3;
@@ -48,6 +48,7 @@ export default function Pokemon(props) {
   const [catchRate, setCatchRate] = useState();
   const [evoNames, setEvonames] = useState([]);
   const [evoId, setEvoid] = useState([]);
+  const [evoData, setEvoData] = useState([]);
 
   const location = useLocation();
   const { index } = location.state;
@@ -232,11 +233,18 @@ export default function Pokemon(props) {
     } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
 
     const idRegEx = /[0-9]+/g;
+    // evoChain.map((ele) => {
+    //   setEvonames((prevEle) => [...prevEle, ele.name]);
+    //   const evoId = ele.url.match(idRegEx);
+    //   setEvoid((prevEle) => [...prevEle, evoId[1]]);
+    // });
+    const evo = [];
     evoChain.map((ele) => {
-      setEvonames((prevEle) => [...prevEle, ele.name]);
       const evoId = ele.url.match(idRegEx);
-      setEvoid((prevEle) => [...prevEle, evoId[1]]);
+      evo.push({ id: evoId[1], name: ele.name });
     });
+
+    setEvoData(evo);
 
     // do {
     //   setEvonames((prevEle) => [...prevEle, evoData.species.name]);
@@ -550,124 +558,170 @@ export default function Pokemon(props) {
             </h5>
             <hr />
             <div className="row align-items-center">
-              <div className="col-md-4 text-center">
-                {imageLoading1 ? (
-                  <>
-                    <img
-                      src={loader}
-                      style={{ width: "3em", height: "3em" }}
-                      id="poke"
-                      className="card-img-top rounded mx-auto mt-4"
-                      alt="pokemon Images"
-                    ></img>
-                    <br />
-                    <br />
-                    <span className="text-danger">
-                      <b>Loading</b>
-                    </span>
-                  </>
-                ) : null}
-                <StyledLink
-                  to={{
-                    pathname: `/pokemon/${evoId[0]}`,
-                  }}
-                  state={{
-                    index: { pokemonIndex: evoId[0] },
-                  }}
-                >
-                  <Sprite
-                    className="card-img-top rounded mx-auto mt-2 image-fluid"
-                    onLoad={() => setImageLoading1(() => false)}
-                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[0]}.png`}
-                    style={
-                      imageLoading1 ? { display: "none" } : { display: "block" }
-                    }
-                  ></Sprite>
-                  <br />
-                  <span>
-                    <b>{evoNames[0]}</b>
-                  </span>
-                </StyledLink>
-              </div>
-              <div className="col-md-4 text-center">
-                {imageLoading2 ? (
-                  <>
-                    <img
-                      src={loader}
-                      style={{ width: "3em", height: "3em" }}
-                      id="poke"
-                      className="card-img-top rounded mx-auto mt-4"
-                      alt="pokemon Images"
-                    ></img>
-                    <br />
-                    <br />
-                    <span className="text-danger">
-                      <b>Loading</b>
-                    </span>
-                  </>
-                ) : null}
-                <StyledLink
-                  to={{
-                    pathname: `/pokemon/${evoId[1]}`,
-                  }}
-                  state={{
-                    index: { pokemonIndex: evoId[1] },
-                  }}
-                >
-                  <Sprite
-                    className="card-img-top rounded mx-auto mt-2 image-fluid"
-                    onLoad={() => setImageLoading2(() => false)}
-                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[1]}.png`}
-                    style={
-                      imageLoading2 ? { display: "none" } : { display: "block" }
-                    }
-                  ></Sprite>
-                  <br />
-                  <span>
-                    <b>{evoNames[1]}</b>
-                  </span>
-                </StyledLink>
-              </div>
-
-              <div className="col-md-4 text-center">
-                {imageLoading3 ? (
-                  <>
-                    <img
-                      src={loader}
-                      style={{ width: "3em", height: "3em" }}
-                      id="poke"
-                      className="card-img-top rounded mx-auto mt-4"
-                      alt="pokemon Images"
-                    ></img>
-                    <br />
-                    <br />
-                    <span className="text-danger">
-                      <b>Loading</b>
+              {evoData.map((ele) => {
+                return (
+                  <div className="col-md-4 text-center">
+                    {imageLoading1 ? (
+                      <>
+                        <img
+                          src={loader}
+                          style={{ width: "3em", height: "3em" }}
+                          id="poke"
+                          className="card-img-top rounded mx-auto mt-4"
+                          alt="pokemon Images"
+                        ></img>
+                        <br />
+                        <br />
+                        <span className="text-danger">
+                          <b>Loading</b>
+                        </span>
+                      </>
+                    ) : null}
+                    <StyledLink
+                      to={{
+                        pathname: `/pokemon/${ele.id}`,
+                      }}
+                      state={{
+                        index: { pokemonIndex: ele.id },
+                      }}
+                    >
+                      <Sprite
+                        className="card-img-top rounded mx-auto mt-2 image-fluid"
+                        onLoad={() => setImageLoading1(() => false)}
+                        src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${ele.id}.png`}
+                        style={
+                          imageLoading1
+                            ? { display: "none" }
+                            : { display: "block" }
+                        }
+                      ></Sprite>
                       <br />
-                    </span>
-                  </>
-                ) : null}
-                <StyledLink
-                  to={{
-                    pathname: `/pokemon/${evoId[2]}`,
-                  }}
-                  state={{
-                    index: { pokemonIndex: evoId[2] },
-                  }}
-                >
-                  <Sprite
-                    className="card-img-top rounded mx-auto mt-2 image-fluid"
-                    onLoad={() => setImageLoading3(() => false)}
-                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[2]}.png`}
-                    style={
-                      imageLoading3 ? { display: "none" } : { display: "block" }
-                    }
-                  ></Sprite>
-                  <span>
-                    <b>{evoNames[2]}</b>
-                  </span>
-                </StyledLink>
-              </div>
+                      <span>
+                        <b>{ele.name}</b>
+                      </span>
+                    </StyledLink>
+                  </div>
+                );
+              })}
+
+              {/*  <div className="col-md-4 text-center">
+                 {imageLoading1 ? (
+                   <>
+                     <img
+                       src={loader}
+                       style={{ width: "3em", height: "3em" }}
+                       id="poke"
+                       className="card-img-top rounded mx-auto mt-4"
+                       alt="pokemon Images"
+                     ></img>
+                     <br />
+                     <br />
+                     <span className="text-danger">
+                       <b>Loading</b>
+                     </span>
+                   </>
+                 ) : null}
+                 <StyledLink
+                   to={{
+                     pathname: `/pokemon/${evoId[0]}`,
+                   }}
+                   state={{
+                     index: { pokemonIndex: evoId[0] },
+                   }}
+                 >
+                   <Sprite
+                     className="card-img-top rounded mx-auto mt-2 image-fluid"
+                     onLoad={() => setImageLoading1(() => false)}
+                     src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[0]}.png`}
+                     style={
+                       imageLoading1 ? { display: "none" } : { display: "block" }
+                     }
+                   ></Sprite>
+                   <br />
+                   <span>
+                     <b>{evoNames[0]}</b>
+                   </span>
+                 </StyledLink>
+               </div>
+                <div className="col-md-4 text-center">
+                 {imageLoading2 ? (
+                   <>
+                     <img
+                       src={loader}
+                       style={{ width: "3em", height: "3em" }}
+                       id="poke"
+                       className="card-img-top rounded mx-auto mt-4"
+                       alt="pokemon Images"
+                     ></img>
+                     <br />
+                     <br />
+                     <span className="text-danger">
+                       <b>Loading</b>
+                     </span>
+                   </>
+                 ) : null}
+                 <StyledLink
+                   to={{
+                     pathname: `/pokemon/${evoId[1]}`,
+                   }}
+                   state={{
+                     index: { pokemonIndex: evoId[1] },
+                   }}
+                 >
+                   <Sprite
+                     className="card-img-top rounded mx-auto mt-2 image-fluid"
+                     onLoad={() => setImageLoading2(() => false)}
+                     src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[1]}.png`}
+                     style={
+                       imageLoading2 ? { display: "none" } : { display: "block" }
+                     }
+                   ></Sprite>
+                   <br />
+                   <span>
+                     <b>{evoNames[1]}</b>
+                   </span>
+                 </StyledLink>
+               </div> 
+
+               <div className="col-md-4 text-center">
+                 {imageLoading3 ? (
+                   <>
+                     <img
+                       src={loader}
+                       style={{ width: "3em", height: "3em" }}
+                       id="poke"
+                       className="card-img-top rounded mx-auto mt-4"
+                       alt="pokemon Images"
+                     ></img>
+                     <br />
+                     <br />
+                     <span className="text-danger">
+                       <b>Loading</b>
+                       <br />
+                     </span>
+                   </>
+                 ) : null}
+                 <StyledLink
+                   to={{
+                     pathname: `/pokemon/${evoId[2]}`,
+                   }}
+                   state={{
+                     index: { pokemonIndex: evoId[2] },
+                   }}
+                 >
+                   <Sprite
+                     className="card-img-top rounded mx-auto mt-2 image-fluid"
+                     onLoad={() => setImageLoading3(() => false)}
+                     src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[2]}.png`}
+                     style={
+                       imageLoading3 ? { display: "none" } : { display: "block" }
+                     }
+                   ></Sprite>
+                   <span>
+                     <b>{evoNames[2]}</b>
+                   </span>
+                 </StyledLink>
+               </div> */}
             </div>
           </div>
           <div className="card-footer text-muted text-center">

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import "./PokemonCard.css";
-import loader from "./pokeball-16841.png";
+import "../../css/PokemonCard.css";
+import loader from "../../images/pokeball-16841.png";
 
 const Sprite = styled.img`
   width: 6em;
@@ -58,7 +58,6 @@ export default function PokemonCard(props) {
   };
 
   return (
-    // <div className="col-md-3 col-sm-4 col-6 mb-4">
     <div className="col-md-3 col-lg-2 col-sm-4 col-6 mb-4">
       <StyledLink
         to={{
@@ -96,7 +95,6 @@ export default function PokemonCard(props) {
                 )
                 .join(" ")}
               <br />
-              {/* {pokemonIndex} */}
             </h6>
           </div>
         </PokeCard>
@@ -104,50 +102,3 @@ export default function PokemonCard(props) {
     </div>
   );
 }
-
-// import React, { useState, useEffect } from "react";
-// import styled from "styled-components";
-// import "./PokemonCard.css";
-// import "../fonts/roboto.regular.ttf";
-// import axios from "axios";
-
-// const Sprite = styled.img`
-//   width: 7em;
-//   height: 7em;
-//   display: none;
-// `;
-
-// export default function PokemonCard(props) {
-//   const [pokemonIndex, setPokemonIndex] = useState();
-//   const [pokemonImageUrl, setPokemonImageUrl] = useState();
-
-//   useEffect(() => {
-//     getPokemon(props.url);
-//   });
-
-//   const getPokemon = async (url) => {
-//     const index = url.split("/")[url.split("/").length - 2];
-//     setPokemonIndex(index);
-//     const imageUrldata = await axios.get(url);
-//     // console.log(imageUrldata.data.sprites.front_default);
-//     setPokemonImageUrl(imageUrldata.sprites.front_default);
-//   };
-
-//   return (
-//     <div>
-//       {props.name}
-//       <br />
-//       {props.url}
-//       <br />
-//       {pokemonIndex}
-//       <br />
-//       <Sprite
-//         className="card-img-top rounded mx-auto mt-2"
-//         // onLoad={() => this.setState({ imageLoading: false })}
-//         // onError={() => this.setState({ toManyRequest: true })}
-//         src={pokemonImageUrl}
-//         style={{ display: "block" }}
-//       ></Sprite>
-//     </div>
-//   );
-// }

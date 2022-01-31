@@ -10,27 +10,10 @@ function App() {
     <Router>
       <div className="App">
         <Navbar />
-        <div
-          className="container"
-          style={
-            backGroundImg
-              ? {
-                  backgroundImage: `url(${backGroundImg})`,
-                  backgroundPosition: "center",
-                  backgroundSize: "cover",
-                  backgroundRepeat: "no-repeat",
-                }
-              : {}
-          }
-        >
+        <div className="container">
           <Routes>
             <Route exact path="/" exact element={<Dashboard />} />
-            <Route
-              exact
-              path="/pokemon/:pokemonIndex"
-              exact
-              element={<Pokemon />}
-            />
+            <Route path="/pokemon/:pokemonIndex" exact element={<Pokemon />} />
           </Routes>
         </div>
       </div>

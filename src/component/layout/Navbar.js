@@ -1,15 +1,10 @@
 import React from "react";
-import pikachuface from "./pikachuface.png";
-import pokeDex from "./PokeDex.png";
-import "./Navbar.css";
-import { useNavigate, Link } from "react-router-dom";
+import pikachuface from "../../images/pikachuface.png";
+import pokeDex from "../../images/PokeDex.png";
+import "../../css/Navbar.css";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
-  let history = useNavigate();
-
-  function GoBack() {
-    history("/");
-  }
   return (
     <div>
       <nav className="navbar navbar-expand-lg fixed-top d-flex justify-content-between">
