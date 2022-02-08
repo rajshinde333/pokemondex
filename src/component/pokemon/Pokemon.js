@@ -57,11 +57,11 @@ export default function Pokemon() {
 
   const alert = useAlert();
 
-  //todo for go to Top of the screen every time when page load successfully
-  window.onload = function () {
-    window.scrollTo(0, 0);
-    console.log("onload");
-  };
+  // //todo for go to Top of the screen every time when page load successfully
+  // window.onload = function () {
+  //   window.scrollTo(0, 0);
+  //   console.log("onload");
+  // };
   // window.onbeforeunload = function () {
   //   window.scrollTo(0, 0);
   //   console.log("before onload");
@@ -73,11 +73,10 @@ export default function Pokemon() {
       if (window.localStorage) {
         if (!localStorage.getItem("firstLoad")) {
           localStorage["firstLoad"] = true;
-          window.location.reload();
+          // window.location.reload();
+          window.location.href = window.location.href;
         } else localStorage.removeItem("firstLoad");
       }
-      console.log("reload");
-      window.scrollTo(0, 0);
     })();
 
     //! if the pokemonindex from link is undefined then show message there is some error and redirect to the homepage

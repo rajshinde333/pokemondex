@@ -34,8 +34,6 @@ function Search(props) {
     setName(e.target.value.toLowerCase());
   };
 
-  console.log(filtered);
-
   return (
     <div>
       <Modal show={props.show} onHide={props.handleClose}>
