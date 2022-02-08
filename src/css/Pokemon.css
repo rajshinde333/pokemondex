@@ -12,23 +12,33 @@
   }
 }
 
-/* .Bground::before {
-  content: "";
+@import url("https://fonts.googleapis.com/css2?family=Nobile:ital,wght@1,700&display=swap");
 
-  opacity: 0.5;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  /* position:absolute;
-  top:0;
-  bottom:0;
-  right:0;
-  left:0;
-  width:auto;
-  height:auto;
-  z-index:-3; */
-/* } */
-*/ .Bug {
+.card {
+  font-weight: 400;
+}
+.name {
+  font-family: "Nobile", sans-serif;
+  letter-spacing: 1px;
+}
+
+b {
+  font-family: "Nobile", sans-serif;
+}
+
+.description {
+  font-size: 18px;
+}
+
+.float-end {
+  font-weight: 600;
+}
+
+.evoNames {
+  font-weight: 600;
+}
+
+.Bug {
   background-color: #b1c12e;
 }
 .Dark {

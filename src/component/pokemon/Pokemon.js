@@ -4,7 +4,8 @@ import axios from "axios";
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import "../../css/Pokemon.css";
-import loader from "../../images/pokeball-16841.png";
+import loader from "../../images/pokeball.svg";
+import { useAlert } from "react-alert";
 
 //todo Some Common constants
 const statTitleWidth = 3;
@@ -25,18 +26,21 @@ const StyledLink = styled(Link)`
   }
 `;
 
-export default function Pokemon(props) {
+export default function Pokemon() {
   const [imageLoading, setImageLoading] = useState(true);
   const [imageLoading1, setImageLoading1] = useState(true);
-  const [imageLoading2, setImageLoading2] = useState(true);
-  const [imageLoading3, setImageLoading3] = useState(true);
   const [name, setName] = useState();
   const [imageUrl, setImageUrl] = useState();
   const [backImageUrl, setBackImageUrl] = useState();
   const [backGroundImg, setBackGroundImg] = useState();
   const [types, setTypes] = useState([]);
   const [description, setDescription] = useState();
-  const [properties, setProperties] = useState([]);
+  const [hp, setHp] = useState();
+  const [attack, setAttack] = useState();
+  const [defense, setDefense] = useState();
+  const [specialAttack, setSpecialAttack] = useState();
+  const [specialDefense, setSpecialDefense] = useState();
+  const [speed, setSpeed] = useState();
   const [height, setHeight] = useState();
   const [weight, setWeight] = useState();
   const [eggGroup, setEggGroup] = useState();
@@ -46,16 +50,40 @@ export default function Pokemon(props) {
   const [evs, setEvs] = useState();
   const [hatchSteps, setHatchSteps] = useState();
   const [catchRate, setCatchRate] = useState();
-  const [evoNames, setEvonames] = useState([]);
-  const [evoId, setEvoid] = useState([]);
   const [evoData, setEvoData] = useState([]);
 
   const location = useLocation();
   const { index } = location.state;
 
+  const alert = useAlert();
+
+  window.onload = function () {
+    window.scrollTo(0, 0);
+  };
+
   useEffect(() => {
+    (function () {
+      if (window.localStorage) {
+        if (!localStorage.getItem("firstLoad")) {
+          localStorage["firstLoad"] = true;
+          window.location.reload();
+        } else localStorage.removeItem("firstLoad");
+      }
+    })();
+
+    //! if the pokemonindex from link is undefined then show message there is some error and redirect to the homepage
+    if (index.pokemonIndex === undefined) {
+      alert.error(
+        "There is some ERROR here, Please Go Back to Home Page, Wait for to complete the loading and TRY AGAIN!",
+        {
+          onClose: () => {
+            window.location.href = "/";
+          },
+        }
+      );
+    }
     getPokemonDetails(index.pokemonIndex);
-  });
+  }, [index.pokemonIndex]);
 
   const getPokemonDetails = async (index) => {
     const url = `https://pokeapi.co/api/v2/pokemon/${index}`;
@@ -91,25 +119,26 @@ export default function Pokemon(props) {
     setWeight(weight);
 
     //! To get Hp, Attack, Defense, Special-Attact, Special-Defense, Speed
+
     result.data.stats.map((stat) => {
       switch (stat.stat.name) {
         case "hp":
-          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
+          setHp(stat["base_stat"]);
           break;
         case "attack":
-          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
+          setAttack(stat["base_stat"]);
           break;
         case "defense":
-          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
+          setDefense(stat["base_stat"]);
           break;
         case "special-attack":
-          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
+          setSpecialAttack(stat["base_stat"]);
           break;
         case "special-defense":
-          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
+          setSpecialDefense(stat["base_stat"]);
           break;
         case "speed":
-          setProperties((prevEle) => [...prevEle, stat["base_stat"]]);
+          setSpeed(stat["base_stat"]);
           break;
         default:
           console.log("default");
@@ -219,7 +248,7 @@ export default function Pokemon(props) {
     const hatchSteps_var = 255 * (speciesRes.data["hatch_counter"] + 1);
     setHatchSteps(hatchSteps_var);
 
-    //!to get the evolution images of this pokemon
+    //! to get the evolution images of this pokemon
     const evoUrl = speciesRes.data["evolution_chain"].url;
     const evoRes = await axios.get(evoUrl);
     var evoData = evoRes.data.chain;
@@ -232,31 +261,39 @@ export default function Pokemon(props) {
       evoData = evoData["evolves_to"][0];
     } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
 
+    //! regex to get the id of the pokemon from URL from JSON
     const idRegEx = /[0-9]+/g;
-    // evoChain.map((ele) => {
-    //   setEvonames((prevEle) => [...prevEle, ele.name]);
-    //   const evoId = ele.url.match(idRegEx);
-    //   setEvoid((prevEle) => [...prevEle, evoId[1]]);
-    // });
     const evo = [];
     evoChain.map((ele) => {
       const evoId = ele.url.match(idRegEx);
       evo.push({ id: evoId[1], name: ele.name });
     });
-
     setEvoData(evo);
-
-    // do {
-    //   setEvonames((prevEle) => [...prevEle, evoData.species.name]);
-    //   evoData = evoData["evolves_to"][0];
-    // } while (!!evoData && evoData.hasOwnProperty("evolves_to"));
+    // window.scrollTo(0, 0);
   };
 
   return (
     <>
-      <div className="col">
-        <div className="card Bground">
-          <div className="card-header">
+      <div
+        className="col"
+        style={{
+          backgroundImage: `url(${backGroundImg})`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          backgroundRepeat: "no-repeat",
+        }}
+      >
+        <div
+          className="card"
+          style={{
+            height: "100%",
+            width: "100%",
+            backgroundColor: "rgba(255, 255, 255, 0.8)",
+            color: "#000",
+          }}
+        >
+          {/* <div className="content"> */}
+          <div className="card-header bg-light">
             <div className="row">
               <div className="col-5">
                 <h5>{index.pokemonIndex}</h5>
@@ -305,7 +342,7 @@ export default function Pokemon(props) {
                 ></Sprite>
               </div>
               <div className="col-md-6">
-                <h4 className="mx-auto mb-4">{name}</h4>
+                <h4 className="mx-auto mb-4 name">{name}</h4>
                 <div className="row align-items-center">
                   <div className={`col-12 col-md-${statTitleWidth}`}>HP</div>
                   <div className={`col-12 col-md-${statBarWidth}`}>
@@ -314,14 +351,14 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${properties[0]}%`,
+                          width: `${hp}%`,
                           backgroundColor: `#00FF00`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-dark">{properties[0]}</big>
+                        <big className="text-dark">{hp}</big>
                       </div>
                     </div>
                   </div>
@@ -336,14 +373,14 @@ export default function Pokemon(props) {
                         className="progress-bar"
                         role="progressbar"
                         style={{
-                          width: `${properties[1]}%`,
+                          width: `${attack}%`,
                           backgroundColor: `#ff0000`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big>{properties[1]}</big>
+                        <big>{attack}</big>
                       </div>
                     </div>
                   </div>
@@ -358,14 +395,14 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${properties[2]}%`,
+                          width: `${defense}%`,
                           backgroundColor: `#02D1FF`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-dark">{properties[2]}</big>
+                        <big className="text-dark">{defense}</big>
                       </div>
                     </div>
                   </div>
@@ -378,14 +415,14 @@ export default function Pokemon(props) {
                         className="progress-bar"
                         role="progressbar"
                         style={{
-                          width: `${properties[5]}%`,
+                          width: `${speed}%`,
                           backgroundColor: `#F7FF00`,
                         }}
                         aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-dark">{properties[5]}</big>
+                        <big className="text-dark">{speed}</big>
                       </div>
                     </div>
                   </div>
@@ -400,14 +437,14 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${properties[3]}%`,
+                          width: `${specialAttack}%`,
                           backgroundColor: `#790000`,
                         }}
-                        aria-valuenow={properties[3]}
+                        aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big className="text-white">{properties[3]}</big>
+                        <big className="text-white">{specialAttack}</big>
                       </div>
                     </div>
                   </div>
@@ -422,14 +459,14 @@ export default function Pokemon(props) {
                         className="progress-bar "
                         role="progressbar"
                         style={{
-                          width: `${properties[4]}%`,
+                          width: `${specialDefense}%`,
                           backgroundColor: `#0247FF`,
                         }}
-                        aria-valuenow={properties[4]}
+                        aria-valuenow="25"
                         aria-valuemin="0"
                         aria-valuemax="100"
                       >
-                        <big>{properties[4]}</big>
+                        <big>{specialDefense}</big>
                       </div>
                     </div>
                   </div>
@@ -457,7 +494,7 @@ export default function Pokemon(props) {
             </div>
             <div className="row mt-4">
               <div className="col">
-                <p className="">{description}</p>
+                <p className="description">{description}</p>
               </div>
             </div>
           </div>
@@ -552,6 +589,7 @@ export default function Pokemon(props) {
                 </div>
               </div>
             </div>
+
             <hr />
             <h5 className="card-title text-center">
               <b>Evolution Chain</b>
@@ -560,7 +598,7 @@ export default function Pokemon(props) {
             <div className="row align-items-center">
               {evoData.map((ele) => {
                 return (
-                  <div className="col-md-4 text-center">
+                  <div className="col-md-4 text-center" key={ele.id}>
                     {imageLoading1 ? (
                       <>
                         <img
@@ -594,143 +632,34 @@ export default function Pokemon(props) {
                             ? { display: "none" }
                             : { display: "block" }
                         }
+                        key={ele.id}
                       ></Sprite>
                       <br />
-                      <span>
-                        <b>{ele.name}</b>
+                      <span className="evoNames">
+                        {ele.name
+                          .toLowerCase()
+                          .split("-")
+                          .map(
+                            (string) =>
+                              string.charAt(0).toUpperCase() +
+                              string.substring(1)
+                          )
+                          .join(" ")}
                       </span>
                     </StyledLink>
                   </div>
                 );
               })}
-
-              {/*  <div className="col-md-4 text-center">
-                 {imageLoading1 ? (
-                   <>
-                     <img
-                       src={loader}
-                       style={{ width: "3em", height: "3em" }}
-                       id="poke"
-                       className="card-img-top rounded mx-auto mt-4"
-                       alt="pokemon Images"
-                     ></img>
-                     <br />
-                     <br />
-                     <span className="text-danger">
-                       <b>Loading</b>
-                     </span>
-                   </>
-                 ) : null}
-                 <StyledLink
-                   to={{
-                     pathname: `/pokemon/${evoId[0]}`,
-                   }}
-                   state={{
-                     index: { pokemonIndex: evoId[0] },
-                   }}
-                 >
-                   <Sprite
-                     className="card-img-top rounded mx-auto mt-2 image-fluid"
-                     onLoad={() => setImageLoading1(() => false)}
-                     src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[0]}.png`}
-                     style={
-                       imageLoading1 ? { display: "none" } : { display: "block" }
-                     }
-                   ></Sprite>
-                   <br />
-                   <span>
-                     <b>{evoNames[0]}</b>
-                   </span>
-                 </StyledLink>
-               </div>
-                <div className="col-md-4 text-center">
-                 {imageLoading2 ? (
-                   <>
-                     <img
-                       src={loader}
-                       style={{ width: "3em", height: "3em" }}
-                       id="poke"
-                       className="card-img-top rounded mx-auto mt-4"
-                       alt="pokemon Images"
-                     ></img>
-                     <br />
-                     <br />
-                     <span className="text-danger">
-                       <b>Loading</b>
-                     </span>
-                   </>
-                 ) : null}
-                 <StyledLink
-                   to={{
-                     pathname: `/pokemon/${evoId[1]}`,
-                   }}
-                   state={{
-                     index: { pokemonIndex: evoId[1] },
-                   }}
-                 >
-                   <Sprite
-                     className="card-img-top rounded mx-auto mt-2 image-fluid"
-                     onLoad={() => setImageLoading2(() => false)}
-                     src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[1]}.png`}
-                     style={
-                       imageLoading2 ? { display: "none" } : { display: "block" }
-                     }
-                   ></Sprite>
-                   <br />
-                   <span>
-                     <b>{evoNames[1]}</b>
-                   </span>
-                 </StyledLink>
-               </div> 
-
-               <div className="col-md-4 text-center">
-                 {imageLoading3 ? (
-                   <>
-                     <img
-                       src={loader}
-                       style={{ width: "3em", height: "3em" }}
-                       id="poke"
-                       className="card-img-top rounded mx-auto mt-4"
-                       alt="pokemon Images"
-                     ></img>
-                     <br />
-                     <br />
-                     <span className="text-danger">
-                       <b>Loading</b>
-                       <br />
-                     </span>
-                   </>
-                 ) : null}
-                 <StyledLink
-                   to={{
-                     pathname: `/pokemon/${evoId[2]}`,
-                   }}
-                   state={{
-                     index: { pokemonIndex: evoId[2] },
-                   }}
-                 >
-                   <Sprite
-                     className="card-img-top rounded mx-auto mt-2 image-fluid"
-                     onLoad={() => setImageLoading3(() => false)}
-                     src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evoId[2]}.png`}
-                     style={
-                       imageLoading3 ? { display: "none" } : { display: "block" }
-                     }
-                   ></Sprite>
-                   <span>
-                     <b>{evoNames[2]}</b>
-                   </span>
-                 </StyledLink>
-               </div> */}
             </div>
           </div>
-          <div className="card-footer text-muted text-center">
+          <div className="card-footer text-center ">
             Data From{" "}
             <a href="https://pokeapi.co/" target="_blank" className="card-link">
               PokeAPI.co
             </a>
           </div>
         </div>
+        {/* </div> */}
       </div>
     </>
   );

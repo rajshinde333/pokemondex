@@ -3,7 +3,7 @@ import styled from "styled-components";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import "../../css/PokemonCard.css";
-import loader from "../../images/pokeball-16841.png";
+import loader from "../../images/pokeball.svg";
 
 const Sprite = styled.img`
   width: 6em;
@@ -38,14 +38,11 @@ export default function PokemonCard(props) {
 
   useEffect(() => {
     getPokemon(props.data);
-  });
+  }, [props.data]);
 
   const getPokemon = async (data) => {
     //todo    to get the pokemon image url from json
-    // setPokemonImageUrl(data.sprites.front_default);
-    setPokemonImageUrl(
-      `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemonIndex}.png`
-    );
+    setPokemonImageUrl(data.sprites.front_default);
 
     //todo    to get the pokemon card color as per their abilities and colors
     const CardColor = await axios.get(data.species.url);

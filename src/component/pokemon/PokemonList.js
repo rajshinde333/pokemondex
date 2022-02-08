@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PokemonCard from "./PokemonCard.js";
+import "../../css/PokemonList.css";
 
 export default function PokemonList() {
   const [url, setUrl] = useState("https://pokeapi.co/api/v2/pokemon");
@@ -39,9 +40,17 @@ export default function PokemonList() {
               />
             ))}
           </div>
-          <div className="text-center">
-            <button className="btn btn-dark" onClick={() => getAllPokemons()}>
+          <div className="text-center mb-4">
+            {/* <button className="btn btn-dark" onClick={() => getAllPokemons()}>
               <span>Load More</span>
+            </button> */}
+
+            <button
+              className="button-54"
+              role="button"
+              onClick={() => getAllPokemons()}
+            >
+              Load More Pokemons
             </button>
           </div>
         </>
